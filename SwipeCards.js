@@ -19,7 +19,7 @@ import clamp from 'clamp';
 import Defaults from './Defaults.js';
 
 const viewport = Dimensions.get('window')
-const SWIPE_THRESHOLD = 120;
+const SWIPE_THRESHOLD = 40;
 
 const styles = StyleSheet.create({
   container: {
@@ -124,6 +124,7 @@ export default class SwipeCards extends Component {
     handleYup: (card) => null,
     handleMaybe: (card) => null,
     handleNope: (card) => null,
+    handlePanMove: (gestureState) => null,
     nopeText: "Nope!",
     maybeText: "Maybe!",
     yupText: "Yup!",
@@ -172,9 +173,14 @@ export default class SwipeCards extends Component {
 
       onPanResponderTerminationRequest: (evt, gestureState) => this.props.allowGestureTermination,
 
-      onPanResponderMove: Animated.event([
-        null, { dx: this.state.pan.x, dy: this.props.dragY ? this.state.pan.y : 0 },
-      ]),
+      onPanResponderMove: (e, gestureState) => {
+        this.props.handlePanMove(gestureState)
+
+        Animated.event([null, {
+          dx: this.state.pan.x,
+          dy: this.props.dragY ? this.state.pan.y : 0
+        }])(e, gestureState)
+      },      
 
       onPanResponderRelease: (e, {vx, vy, dx, dy}) => {
         this.props.onDragRelease()
@@ -193,22 +199,18 @@ export default class SwipeCards extends Component {
           velocity = dx < 0 ? -3 : 3;
         }
 
-        const hasSwipedHorizontally = Math.abs(this.state.pan.x._value) > SWIPE_THRESHOLD
         const hasSwipedVertically = Math.abs(this.state.pan.y._value) > SWIPE_THRESHOLD
-        if (hasSwipedHorizontally || (hasSwipedVertically && this.props.hasMaybeAction)) {
 
+        if (hasSwipedVertically) {
           let cancelled = false;
 
-          const hasMovedRight = hasSwipedHorizontally && this.state.pan.x._value > 0
-          const hasMovedLeft = hasSwipedHorizontally && this.state.pan.x._value < 0
           const hasMovedUp = hasSwipedVertically && this.state.pan.y._value < 0
+          const hasMovedDown = hasSwipedVertically && this.state.pan.y._value > 0
 
-          if (hasMovedRight) {
+          if (hasMovedUp) {
             cancelled = this.props.handleYup(this.state.card);
-          } else if (hasMovedLeft) {
+          } else if (hasMovedDown) {
             cancelled = this.props.handleNope(this.state.card);
-          } else if (hasMovedUp && this.props.hasMaybeAction) {
-            cancelled = this.props.handleMaybe(this.state.card);
           } else {
             cancelled = true
           }
