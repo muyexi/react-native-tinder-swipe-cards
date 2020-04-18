@@ -176,10 +176,10 @@ export default class SwipeCards extends Component {
       onPanResponderMove: (e, gestureState) => {
         this.props.handlePanMove(gestureState)
 
-        Animated.event([null, {
-          dx: this.state.pan.x,
-          dy: this.props.dragY ? this.state.pan.y : 0
-        }])(e, gestureState)
+        // Animated.event([null, {
+        //   dx: this.state.pan.x,
+        //   dy: this.props.dragY ? this.state.pan.y : 0
+        // }])(e, gestureState)
       },      
 
       onPanResponderRelease: (e, {vx, vy, dx, dy}) => {
@@ -199,13 +199,13 @@ export default class SwipeCards extends Component {
           velocity = dx < 0 ? -3 : 3;
         }
 
-        const hasSwipedVertically = Math.abs(this.state.pan.y._value) > SWIPE_THRESHOLD
+        const hasSwipedVertically = Math.abs(dy) > SWIPE_THRESHOLD
 
         if (hasSwipedVertically) {
           let cancelled = false;
 
-          const hasMovedUp = hasSwipedVertically && this.state.pan.y._value < 0
-          const hasMovedDown = hasSwipedVertically && this.state.pan.y._value > 0
+          const hasMovedUp = hasSwipedVertically && dy < 0
+          const hasMovedDown = hasSwipedVertically && dy > 0
 
           if (hasMovedUp) {
             cancelled = this.props.handleYup(this.state.card);
