@@ -451,7 +451,7 @@ export default class SwipeCards extends Component {
 
     let animatedCardStyles = { transform: [{ scale: scale }] };
 
-    return <Animated.View key={"top"} style={[styles.card, animatedCardStyles]} {... this._panResponder.panHandlers}>
+    return <Animated.View key={"top"} style={[styles.card]} {... this._panResponder.panHandlers}>
       {this.props.renderCard(this.state.card)}
     </Animated.View>;
   }
